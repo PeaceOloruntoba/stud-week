@@ -1,89 +1,73 @@
-// app.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // Import FormsModule
-import { TicketPurchaseService } from './ticket-purchase.service';
-import { NgxSonnerModule } from 'ngx-sonner';
-import axios from 'axios';
+import { FormsModule } from '@angular/forms';
 import { interval, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { NgxSonnerToaster, toast } from 'ngx-sonner';
+
+interface FormData {
+  fullName: string;
+  ticketType: string;
+  quantity: number;
+  attendeeNames: string[];
+}
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, FormsModule, NgxSonnerModule],
+  imports: [CommonModule, FormsModule, NgxSonnerToaster],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
-  providers: [TicketPurchaseService], // Provide the service
 })
 export class AppComponent implements OnInit {
-  showModal = true; // Control the modal's visibility
-  currentStep$ = this.ticketService.currentStep$;
-  formData$ = this.ticketService.formData$;
-  isSubmitting$ = this.ticketService.isSubmitting$;
-  paymentCode$ = this.ticketService.paymentCode$;
-  paymentMade$ = this.ticketService.paymentMade$;
+  showModal = true;
+  currentStep = 1;
+  formData: FormData = {
+    fullName: '',
+    ticketType: '',
+    quantity: 1,
+    attendeeNames: [],
+  };
+  isSubmitting = false;
+  paymentCode: string | null = null;
+  paymentMade = false;
   remainingTime = 30;
   isPaymentButtonDisabled = true;
   private countdownSubscription: Subscription | undefined;
 
-  constructor(private ticketService: TicketPurchaseService) {}
+  constructor() {}
 
   ngOnInit(): void {
-    this.paymentMade$.subscribe((madePayment) => {
-      if (madePayment) {
-        this.resetForm();
-      }
-    });
+    //  this.paymentMade$.subscribe((madePayment) => { // Removed service dependency
+    //    if (madePayment) {
+    //      this.resetForm();
+    //    }
+    //  });
   }
 
   nextStep(): void {
-    if (
-      this.ticketService.formData.quantity > 1 &&
-      this.ticketService.currentStep$.value === 1
-    ) {
-      this.ticketService.nextStep(); // Go to the multiple names step
-    } else if (this.ticketService.currentStep$.value < 3) {
-      this.ticketService.nextStep();
+    if (this.formData.quantity > 1 && this.currentStep === 1) {
+      this.currentStep = 2;
+    } else if (this.currentStep < 3) {
+      this.currentStep++;
     }
   }
 
   prevStep(): void {
-    if (this.ticketService.currentStep$.value > 1) {
-      this.ticketService.prevStep();
+    if (this.currentStep > 1) {
+      this.currentStep--;
     }
   }
 
-  updateFormData(data: Partial<FormData>): void {
-    this.ticketService.setFormData(data);
-  }
-
   submitForm(): void {
-    this.ticketService.setIsSubmitting(true);
-    // Simulate API call
+    this.isSubmitting = true;
     setTimeout(() => {
-      const mockResponse = { code: 'ABC123XYZ' }; // Replace with actual API response
-      this.ticketService.setPaymentCode(mockResponse.code);
-      this.ticketService.setIsSubmitting(false);
-      this.ticketService.nextStep(); // Move to payment details
+      this.paymentCode = 'ABC123XYZ';
+      this.isSubmitting = false;
+      this.currentStep = 3;
       this.startPaymentCountdown();
+      toast.success('Form submitted successfully!');
     }, 2000);
-
-    // Actual API call using axios:
-    // axios.post('your-submission-endpoint', this.ticketService.formData)
-    //   .then(response => {
-    //     this.ticketService.setPaymentCode(response.data.code);
-    //     this.ticketService.setIsSubmitting(false);
-    //     this.ticketService.nextStep(); // Move to payment details
-    //     this.startPaymentCountdown();
-    //     this.sonner.success('Form submitted successfully!');
-    //   })
-    //   .catch(error => {
-    //     console.error('Submission error:', error);
-    //     this.ticketService.setIsSubmitting(false);
-    //     this.sonner.error('Failed to submit form.');
-    //   });
   }
 
   startPaymentCountdown(): void {
@@ -103,41 +87,37 @@ export class AppComponent implements OnInit {
   }
 
   madePayment(): void {
-    if (
-      !this.isPaymentButtonDisabled &&
-      this.ticketService.paymentCode$.value
-    ) {
-      // Simulate second API call
+    if (!this.isPaymentButtonDisabled && this.paymentCode) {
       setTimeout(() => {
-        console.log(
-          'Payment confirmed with code:',
-          this.ticketService.paymentCode$.value
-        );
-        this.ticketService.setPaymentMade(true);
-        this.sonner.success('Payment confirmed!');
+        console.log('Payment confirmed with code:', this.paymentCode);
+        this.paymentMade = true;
+        toast.success('Payment confirmed!');
         if (this.countdownSubscription) {
           this.countdownSubscription.unsubscribe();
         }
+        this.resetForm(); // simplified reset.
       }, 1500);
-
-      // Actual API call for confirming payment:
-      // axios.post('your-payment-confirmation-endpoint', { code: this.ticketService.paymentCode$.value })
-      //   .then(response => {
-      //     this.ticketService.setPaymentMade(true);
-      //     this.sonner.success('Payment confirmed!');
-      //     if (this.countdownSubscription) {
-      //       this.countdownSubscription.unsubscribe();
-      //     }
-      //   })
-      //   .catch(error => {
-      //     console.error('Payment confirmation error:', error);
-      //     this.sonner.error('Failed to confirm payment.');
-      //   });
     }
   }
 
   resetForm(): void {
-    this.ticketService.resetForm();
-    this.showModal = true; // If you want to keep the modal open after reset
+    this.formData = {
+      fullName: '',
+      ticketType: '',
+      quantity: 1,
+      attendeeNames: [],
+    };
+    this.currentStep = 1;
+    this.paymentCode = null;
+    this.paymentMade = false;
+    this.showModal = true;
+  }
+
+  getNumber(n: number): number[] {
+    return Array.from({ length: n }, (_, index) => index);
+  }
+
+  updateAttendeeNames() {
+    this.formData.attendeeNames = Array(this.formData.quantity).fill('');
   }
 }

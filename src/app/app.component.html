@@ -4,21 +4,80 @@
   <header
     class="w-full px-6 py-2 flex items-center justify-between backdrop-blur-md bg-black/20"
   >
-    <span class="text-white text-2xl font-semibold"
-      >Anchor University, Lagos</span
-    >
+    <span class="text-white text-2xl font-semibold">Anchor University, Lagos</span>
     <span>Menu menu</span>
   </header>
-  <body>
-    <div
-      class="w-fit px-6 py-2 flex items-center justify-between backdrop-blur-md bg-black/20"
-    ></div>
-  </body>
+  <div *ngIf="showModal" class="fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-md shadow-lg w-full max-w-md">
+      <h2 class="text-xl font-semibold mb-4">Ticket Purchase</h2>
+
+      <div *ngIf="currentStep$ | async as step">
+        <ng-container [ngSwitch]="step">
+          <div *ngSwitchCase="1">
+            <div class="mb-4">
+              <label for="fullName" class="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
+              <input type="text" id="fullName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" [(ngModel)]="ticketService.formData.fullName" />
+            </div>
+            <div class="mb-4">
+              <label for="ticketType" class="block text-gray-700 text-sm font-bold mb-2">Ticket Type:</label>
+              <select id="ticketType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" [(ngModel)]="ticketService.formData.ticketType">
+                <option value="" disabled>Select Ticket Type</option>
+                <option value="regular">Regular</option>
+                <option value="vip">VIP</option>
+                <option value="student">Student</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Quantity:</label>
+              <input type="number" id="quantity" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" [(ngModel)]="ticketService.formData.quantity" (change)="ticketService.setFormData({ attendeeNames: Array(ticketService.formData.quantity).fill('') })" min="1" />
+            </div>
+            <div class="flex justify-end">
+              <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" (click)="nextStep()" [disabled]="!ticketService.formData.fullName || !ticketService.formData.ticketType || !ticketService.formData.quantity">Next</button>
+            </div>
+          </div>
+
+          <div *ngSwitchCase="2">
+            <h3 class="text-lg font-semibold mb-2">Attendee Names</h3>
+            <div *ngFor="let i of getNumber(ticketService.formData.quantity); let index = index" class="mb-2">
+              <label [for]="'attendeeName' + index" class="block text-gray-700 text-sm font-bold mb-2">Name for Ticket {{ index + 1 }}:</label>
+              <input type="text" [id]="'attendeeName' + index" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" [(ngModel)]="ticketService.formData.attendeeNames[index]" />
+            </div>
+            <div class="flex justify-between">
+              <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" (click)="prevStep()">Previous</button>
+              <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" (click)="submitForm()" [disabled]="ticketService.formData.quantity > 1 && ticketService.formData.attendeeNames.some(name => !name)">Submit</button>
+            </div>
+          </div>
+
+          <div *ngSwitchCase="3">
+            <h3 class="text-lg font-semibold mb-4">Payment Details</h3>
+            <p>Please pay into the following account:</p>
+            <p>Account Number: 1234567890</p>
+            <p>Bank: Example Bank</p>
+            <p class="mb-4">Amount: [Calculate Amount]</p>
+            <button [disabled]="isSubmitting$ | async" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring focus:ring-yellow-300">
+              <span *ngIf="isSubmitting$ | async">Processing...</span>
+              <span *ngIf="!(isSubmitting$ | async)">Pay Now</span>
+            </button>
+
+            <div class="mt-4">
+              <button
+                [disabled]="isPaymentButtonDisabled"
+                (click)="madePayment()"
+                class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              >
+                I have made payment <span *ngIf="isPaymentButtonDisabled">({{ remainingTime }}s)</span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <ngx-sonner></ngx-sonner>
+    </div>
+  </div>
   <footer
     class="w-full px-6 py-2 flex items-center justify-center backdrop-blur-md bg-black/20"
   >
-    <span class="text-white text-2xl font-semibold"
-      >Anchor University, Lagos</span
-    >
+    <span class="text-white text-2xl font-semibold">Anchor University, Lagos</span>
   </footer>
 </main>
