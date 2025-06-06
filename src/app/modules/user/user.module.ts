@@ -1,14 +1,17 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import { UserRoutingModule } from './user-routing.module';
-
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { HomeComponent } from './components/home/home.component';
+import { NgxSonnerToaster } from 'ngx-sonner';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
-    UserRoutingModule
-  ]
+    FormsModule,
+    RouterModule.forChild([{ path: '', component: HomeComponent }]),
+    NgxSonnerToaster,
+  ],
 })
-export class UserModule { }
+export class UserModule {}

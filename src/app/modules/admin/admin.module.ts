@@ -1,14 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import { AdminRoutingModule } from './admin-routing.module';
-
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { NgxSonnerToaster } from 'ngx-sonner';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
-    AdminRoutingModule
-  ]
+    FormsModule,
+    RouterModule.forChild([
+      { path: '', component: DashboardComponent, canActivate: [AuthGuard] },
+    ]),
+    NgxSonnerToaster,
+  ],
 })
-export class AdminModule { }
+export class AdminModule {}

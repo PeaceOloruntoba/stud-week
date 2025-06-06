@@ -1,1 +1,71 @@
-<p>home works!</p>
+<div *ngIf="showModal" class="fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50">
+   <div class="bg-white p-8 rounded-md shadow-lg w-full max-w-md">
+     <h2 class="text-xl font-semibold mb-4">Ticket Purchase</h2>
+ 
+     <div *ngIf="currentStep === 1">
+       <form (ngSubmit)="nextStep()">
+         <div class="mb-4">
+           <label for="fullName" class="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
+           <input type="text" id="fullName" class="shadow border rounded w-full py-2 px-3" [(ngModel)]="formData.fullName" required />
+         </div>
+         <div class="mb-4">
+           <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+           <input type="email" id="email" class="shadow border rounded w-full py-2 px-3" [(ngModel)]="formData.email" required />
+         </div>
+         <div class="mb-4">
+           <label for="ticketType" class="block text-gray-700 text-sm font-bold mb-2">Ticket Type:</label>
+           <select id="ticketType" class="shadow border rounded w-full py-2 px-3" [(ngModel)]="formData.ticketType" required>
+             <option value="" disabled>Select Ticket Type</option>
+             <option value="regular">Regular</option>
+             <option value="vip">VIP</option>
+             <option value="student">Student</option>
+           </select>
+         </div>
+         <div class="mb-4">
+           <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Quantity:</label>
+           <input type="number" id="quantity" class="shadow border rounded w-full py-2 px-3" [(ngModel)]="formData.quantity" (change)="updateAttendeeNames()" min="1" required />
+         </div>
+         <div class="flex justify-end">
+           <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" [disabled]="!formData.fullName || !formData.email || !formData.ticketType || !formData.quantity">
+             Next
+           </button>
+         </div>
+       </form>
+     </div>
+ 
+     <div *ngIf="currentStep === 2">
+       <h3 class="text-lg font-semibold mb-2">Attendee Names</h3>
+       <form (ngSubmit)="submitForm()">
+         <div *ngFor="let i of getNumber(formData.quantity); let index = index" class="mb-2">
+           <label [for]="'attendeeName' + index" class="block text-gray-700 text-sm font-bold mb-2">Name for Ticket {{ index + 1 }}:</label>
+           <input type="text" [id]="'attendeeName' + index" class="shadow border rounded w-full py-2 px-3" [(ngModel)]="formData.attendeeNames[index]" required />
+         </div>
+         <div class="flex justify-between">
+           <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" (click)="prevStep()">Previous</button>
+           <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" [disabled]="isSubmitting">
+             Submit
+           </button>
+         </div>
+       </form>
+     </div>
+ 
+     <div *ngIf="currentStep === 3">
+       <h3 class="text-lg font-semibold mb-4">Payment Details</h3>
+       <p>Please pay into the following account:</p>
+       <p>Account Number: <span>8166846226</span></p>
+       <p>Bank: <span>Opay</span></p>
+       <p>Bank Holder Name: <span>Peace Joseph Oloruntoba</span></p>
+       <p class="mb-4">Amount: {{ calculateAmount() | currency:'NGN' }}</p>
+       <button [disabled]="isSubmitting" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-yellow-600" (click)="downloadReceipt()">
+         <span *ngIf="isSubmitting">Processing...</span>
+         <span *ngIf="!isSubmitting">Download Receipt</span>
+       </button>
+       <div class="mt-4">
+         <button [disabled]="isPaymentButtonDisabled" (click)="madePayment()" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+           I have made payment <span *ngIf="isPaymentButtonDisabled">({{ remainingTime }}s)</span>
+         </button>
+       </div>
+     </div>
+     <ngx-sonner-toaster />
+   </div>
+ </div>

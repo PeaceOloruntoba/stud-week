@@ -1,1 +1,53 @@
-<p>dashboard works!</p>
+<div class="container mx-auto p-4">
+   <h2 class="text-2xl font-semibold mb-4">Admin Dashboard</h2>
+   <table class="w-full border-collapse border">
+     <thead>
+       <tr class="bg-gray-200">
+         <th class="border p-2">Payment Code</th>
+         <th class="border p-2">Full Name</th>
+         <th class="border p-2">Email</th>
+         <th class="border p-2">Ticket Type</th>
+         <th class="border p-2">Quantity</th>
+         <th class="border p-2">Status</th>
+         <th class="border p-2">Actions</th>
+       </tr>
+     </thead>
+     <tbody>
+       <tr *ngFor="let ticket of tickets">
+         <td class="border p-2">{{ ticket.paymentCode }}</td>
+         <td class="border p-2">{{ ticket.fullName }}</td>
+         <td class="border p-2">{{ ticket.email }}</td>
+         <td class="border p-2">{{ ticket.ticketType }}</td>
+         <td class="border p-2">{{ ticket.quantity }}</td>
+         <td class="border p-2">{{ ticket.status }}</td>
+         <td class="border p-2">
+           <button (click)="viewDetails(ticket)" class="bg-blue-500 text-white py-1 px-2 rounded mr-2">Details</button>
+           <button *ngIf="ticket.status === 'payment_made'" (click)="confirmTicket(ticket)" class="bg-green-500 text-white py-1 px-2 rounded mr-2">Confirm</button>
+           <button *ngIf="ticket.status === 'payment_made'" (click)="declineTicket(ticket)" class="bg-red-500 text-white py-1 px-2 rounded">Decline</button>
+         </td>
+       </tr>
+     </tbody>
+   </table>
+   <button (click)="exportToExcel()" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded mt-4">
+     Export to Excel
+   </button>
+ 
+   <div *ngIf="selectedTicket" class="mt-4 p-4 border rounded">
+     <h3 class="text-lg font-semibold">Ticket Details</h3>
+     <p>Payment Code: {{ selectedTicket.paymentCode }}</p>
+     <p>Full Name: {{ selectedTicket.fullName }}</p>
+     <p>Email: {{ selectedTicket.email }}</p>
+     <p>Ticket Type: {{ selectedTicket.ticketType }}</p>
+     <p>Quantity: {{ selectedTicket.quantity }}</p>
+     <p>Attendees: {{ selectedTicket.attendeeNames.join(', ') }}</p>
+     <p>Status: {{ selectedTicket.status }}</p>
+     <div *ngIf="selectedTicket.status === 'declined'">
+       <p>Reason: {{ selectedTicket.reason }}</p>
+     </div>
+     <div *ngIf="showDeclineForm">
+       <label for="declineReason" class="block text-sm font-bold mb-2">Reason for Decline:</label>
+       <textarea id="declineReason" class="w-full border p-2" [(ngModel)]="declineReason" rows="4"></textarea>
+       <button (click)="submitDecline()" class="bg-red-500 text-white py-2 px-4 rounded mt-2">Submit Decline</button>
+     </div>
+   </div>
+ </div>

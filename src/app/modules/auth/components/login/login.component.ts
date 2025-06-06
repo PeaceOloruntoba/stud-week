@@ -1,69 +1,36 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { AuthService } from '../../services/auth.service';
-import { NgIf } from '@angular/common';
-import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
+  imports: [FormsModule, CommonModule, NgxSonnerToaster],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, NgIf],
 })
-export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
-  loading = false;
+export class LoginComponent {
+  email = '';
+  password = '';
+  isSubmitting = false;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
-    this.loginForm = this.formBuilder.group({});
-  }
+  constructor(private authService: AuthService, private router: Router) {}
 
-  ngOnInit(): void {
-    this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
-  }
-
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      return;
-    }
-
-    this.loading = true;
-    const { email, password } = this.loginForm.value;
-
+  login(): void {
+    this.isSubmitting = true;
     this.authService
-      .login(email, password)
-      .then((user) => {
-        this.loading = false;
-        toast.success('Login Successful!');
-        console.log(user);
-        if (user) {
-          switch (user.userType) {
-            case 'admin':
-              this.router.navigate(['/admin']);
-              break;
-            default:
-              this.router.navigate(['/']);
-          }
-        }
+      .login(this.email, this.password)
+      .then(() => {
+        this.isSubmitting = false;
+        toast.success('Login successful!');
+        this.router.navigate(['/admin']);
       })
-      .catch((error: any) => {
-        // Explicitly type error as any
-        this.loading = false;
-        console.error('Login error:', error);
+      .catch((error) => {
+        this.isSubmitting = false;
+        toast.error('Login failed: ' + error.message);
       });
   }
 }
