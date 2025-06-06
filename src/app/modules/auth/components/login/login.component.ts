@@ -52,22 +52,8 @@ export class LoginComponent implements OnInit {
         console.log(user);
         if (user) {
           switch (user.userType) {
-            case 'user':
-              this.router.navigate(['/users/dashboard']);
-              break;
-            case 'company':
-              if (!user.isProfile) {
-                this.router.navigate(['/company/create-profile']);
-                return;
-              }
-              if (!user.isSubscribed) {
-                this.router.navigate(['/company/subscription']);
-                return;
-              }
-              this.router.navigate(['/company/jobs']);
-              break;
             case 'admin':
-              this.router.navigate(['/admin/start']);
+              this.router.navigate(['/admin']);
               break;
             default:
               this.router.navigate(['/']);
