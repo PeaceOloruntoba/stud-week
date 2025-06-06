@@ -11,7 +11,7 @@ import jsPDF from 'jspdf';
 interface FormData {
   fullName: string;
   email: string;
-  ticketType: string;
+  ticketType: 'regular' | 'vip' | 'student';
   quantity: number;
   attendeeNames: string[];
   paymentCode?: string;
@@ -32,7 +32,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   formData: FormData = {
     fullName: '',
     email: '',
-    ticketType: '',
+    ticketType: 'regular',
     quantity: 1,
     attendeeNames: [],
     status: 'pending',
@@ -72,7 +72,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   calculateAmount(): number {
-    const prices = { regular: 5000, vip: 15000, student: 3000 }; // Example prices in NGN
+    const prices: { [key: string]: number } = {
+      regular: 5000,
+      vip: 15000,
+      student: 3000,
+    };
     return prices[this.formData.ticketType] * this.formData.quantity;
   }
 
@@ -170,7 +174,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.formData = {
       fullName: '',
       email: '',
-      ticketType: '',
+      ticketType: 'regular',
       quantity: 1,
       attendeeNames: [],
       status: 'pending',
