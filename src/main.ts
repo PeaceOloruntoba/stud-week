@@ -8,6 +8,7 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideStorage, getStorage } from '@angular/fire/storage';
 import { provideFunctions, getFunctions } from '@angular/fire/functions';
 import { environment } from './environments/environment';
+import "./styles.css"
 
 bootstrapApplication(AppComponent, {
   providers: [

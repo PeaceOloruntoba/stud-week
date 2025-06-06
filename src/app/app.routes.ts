@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './modules/auth/guards/auth.guard';
+// import { AuthGuard } from './modules/auth/guards/auth.guard';
 // import { DashboardComponent } from './modules/user/components/dashboard/dashboard.component'; // Remove direct imports of components
 // import { ProfileComponent } from './modules/user/components/profile/profile.component'; // Remove direct imports
 
