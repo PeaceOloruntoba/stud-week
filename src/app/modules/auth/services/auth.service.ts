@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Auth, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -9,15 +9,14 @@ export class AuthService {
   private authState = new BehaviorSubject<any>(null);
   authState$ = this.authState.asObservable();
 
-  constructor(private afAuth: AngularFireAuth) {
-    this.afAuth.authState.subscribe((user) => {
+  constructor(private auth: Auth) {
+    this.auth.onAuthStateChanged((user) => {
       this.authState.next(user);
     });
   }
 
   login(email: string, password: string): Promise<void> {
-    return this.afAuth
-      .signInWithEmailAndPassword(email, password)
+    return signInWithEmailAndPassword(this.auth, email, password)
       .then(() => {})
       .catch((error) => {
         throw error;
@@ -25,8 +24,7 @@ export class AuthService {
   }
 
   logout(): Promise<void> {
-    return this.afAuth
-      .signOut()
+    return signOut(this.auth)
       .then(() => {})
       .catch((error) => {
         throw error;
