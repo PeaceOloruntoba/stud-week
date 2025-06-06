@@ -15,7 +15,7 @@ import { NgxSonnerToaster } from 'ngx-sonner';
 export class AppComponent implements OnInit, OnDestroy {
   [x: string]: any;
   fliers = [
-    'assets/flier1.jpg',
+    'src/assets/flier1.jpg',
     'assets/flier2.jpg',
   ];
   currentFlier = this.fliers[0];
