@@ -19,7 +19,7 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./modules/admin/admin.module').then((m) => m.AdminModule),
   },
-  { path: '**', redirectTo: '/login' },
+  { path: '**', redirectTo: '/auth/login' },
   {
     path: 'unauthorized',
     loadComponent: () =>

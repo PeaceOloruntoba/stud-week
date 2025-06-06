@@ -1,5 +1,5 @@
-<main class="w-screen h-screen flex flex-col items-center justify-between" [ngStyle]="{'background-image': 'url(' + currentFlier + ')'}">
-  <header class="w-full px-6 py-2 flex items-center justify-between backdrop-blur-md bg-black/20">
+<main class="w-screen min-h-screen flex flex-col items-center justify-between" [ngStyle]="{'background-image': 'url(' + currentFlier + ')'}">
+  <header class="w-full px-6 py-2 flex items-center justify-between backdrop-blur-md bg-black/20 h-full">
     <span class="text-white text-2xl font-semibold">Anchor University, Lagos</span>
     <nav>
       <a routerLink="/auth/login" *ngIf="!isAuthenticated" class="text-white">Login</a>
