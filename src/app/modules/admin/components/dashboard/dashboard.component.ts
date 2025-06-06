@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
-import { NgxSonnerToaster, toast } from 'ngx-sonner';
+import { toast } from 'ngx-sonner'
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
@@ -21,7 +21,7 @@ interface Ticket {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxSonnerToaster],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit {
       .snapshotChanges()
       .subscribe((actions) => {
         this.tickets = actions.map((action) => ({
-          id: action.payload.doc.id,
+          // id: action.payload.doc.id,
           ...action.payload.doc.data(),
         }));
       });
@@ -75,7 +75,7 @@ export class DashboardComponent implements OnInit {
   }
 
   submitDecline(): void {
-    if (this.selectedTicket && this.declineReason) {
+    if (this.selectedTicket && this.declineReason && this.selectedTicket.id) {
       this.firestore
         .collection('tickets')
         .doc(this.selectedTicket.id)
@@ -83,7 +83,7 @@ export class DashboardComponent implements OnInit {
         .then(() => {
           toast.success('Ticket declined!');
           this.sendEmail('rejection', this.selectedTicket!.email, {
-            ...this.selectedTicket,
+            ...this.selectedTicket!,
             reason: this.declineReason,
           });
           this.selectedTicket = null;
@@ -93,6 +93,8 @@ export class DashboardComponent implements OnInit {
         .catch((error) =>
           toast.error('Error declining ticket: ' + error.message)
         );
+    } else {
+      toast.error('Invalid ticket or reason');
     }
   }
 
@@ -118,6 +120,6 @@ export class DashboardComponent implements OnInit {
     );
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Tickets');
-    XLSX.write(wb, { bookType: 'xlsx', type: 'array' }, 'tickets.xlsx');
+    XLSX.writeFile(wb, 'tickets.xlsx');
   }
 }
