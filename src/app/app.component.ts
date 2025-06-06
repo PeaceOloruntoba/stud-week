@@ -3,17 +3,19 @@ import { RouterOutlet, RouterLink } from '@angular/router';
 import { interval, Subscription } from 'rxjs';
 import { AuthService } from './modules/auth/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { NgxSonnerToaster } from 'ngx-sonner';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, CommonModule],
+  imports: [RouterOutlet, RouterLink, CommonModule, NgxSonnerToaster],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit, OnDestroy {
+  [x: string]: any;
   fliers = [
-    'assets/flier1.jpg', // Replace with your actual flier paths
+    'assets/flier1.jpg',
     'assets/flier2.jpg',
   ];
   currentFlier = this.fliers[0];
